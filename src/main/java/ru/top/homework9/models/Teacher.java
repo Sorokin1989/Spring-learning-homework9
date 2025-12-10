@@ -19,7 +19,7 @@ public class Teacher {
     private Double salary;
     private String email;
     private Boolean isActive;
-    private static Integer count;
+    private static Integer count=0;
 
     public Teacher(String firstName, String lastName, String subject, Integer experience, Double salary, String email, Boolean isActive) {
         this.id = count++;
