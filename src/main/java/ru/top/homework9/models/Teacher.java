@@ -1,5 +1,7 @@
 package ru.top.homework9.models;
 
+import ru.top.homework9.dto.TeacherDto;
+
 public class Teacher {
     //id: Integer
     //firstName: String (Имя)
@@ -17,9 +19,10 @@ public class Teacher {
     private Double salary;
     private String email;
     private Boolean isActive;
+    private static Integer count;
 
-    public Teacher(int id, String firstName, String lastName, String subject, Integer experience, Double salary, String email, Boolean isActive) {
-        this.id = id;
+    public Teacher(String firstName, String lastName, String subject, Integer experience, Double salary, String email, Boolean isActive) {
+        this.id = count++;
         this.firstName = firstName;
         this.lastName = lastName;
         this.subject = subject;
@@ -91,5 +94,8 @@ public class Teacher {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+    public TeacherDto convert(){
+        return new TeacherDto(this.firstName, this.lastName, this.subject, this.experience, this.salary, this.email, this.isActive);
     }
 }

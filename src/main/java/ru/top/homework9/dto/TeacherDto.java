@@ -1,5 +1,7 @@
 package ru.top.homework9.dto;
 
+import ru.top.homework9.models.Teacher;
+
 public class TeacherDto {
 
     //TeacherDTO
@@ -83,5 +85,9 @@ public class TeacherDto {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+    public Teacher convert(){
+        return new Teacher(this.firstName,this.lastName,
+                this.subject,this.experience,this.salary,this.email,this.isActive);
     }
 }
