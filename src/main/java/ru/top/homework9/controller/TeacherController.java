@@ -18,8 +18,8 @@ public class TeacherController {
 
     public TeacherController() {
         teachers = new ArrayList<>();
-//      teachers.add(new Teacher("Дмитрий","Сорокин","математика",5,200000.0,"sorokindmitrijj2@rambler.ru",true));
-//      teachers.add(new Teacher("Иван","Иванов","биология",4,150000.0,"triobjtrjbs2@rambler.ru", true));
+      teachers.add(new Teacher("Дмитрий","Сорокин","математика",5,90000.0,"sorokindmitrijj2@rambler.ru",true));
+      teachers.add(new Teacher("Иван","Иванов","биология",4,15000.0,"triobjtrjbs2@rambler.ru", true));
     }
 
     @GetMapping("/all")
@@ -44,6 +44,24 @@ public class TeacherController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
               "Teacher with id " + id + " not found");
     }
+@GetMapping("/search")
+    public List<TeacherDto> searchTeacher(@RequestParam(required = false,name = "name") String firstName,
+                                          @RequestParam(required = false,name = "surname") String lastName) {
+
+return teachers.stream().filter(teacher -> {
+  boolean nameMatches=  firstName==null || firstName.isEmpty() || (teacher.getFirstName()!=null
+            && teacher.getFirstName().equalsIgnoreCase(firstName));
+
+  boolean surnameMatches =  lastName==null || lastName.isEmpty() || (teacher.getLastName()!=null
+          && teacher.getLastName().equalsIgnoreCase(lastName));
+
+  return nameMatches && surnameMatches;
+}).map(teacher -> teacher.convert()).toList();
+
+
+    }
+
+
 
     @PostMapping("/add")
     public String add(@RequestBody TeacherDto teacherDto) {
