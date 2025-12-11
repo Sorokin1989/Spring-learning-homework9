@@ -1,9 +1,12 @@
 package ru.top.homework9.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.top.homework9.dto.TeacherDto;
 import ru.top.homework9.models.Teacher;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,34 +32,51 @@ public class TeacherController {
         return new ArrayList<>();
     }
 
+@GetMapping("/{id}")
+    public TeacherDto getById(@PathVariable(name = "id") Integer id) {
+            for (Teacher teacher : teachers) {
+                if (id!=null && id>0 && id.equals(teacher.getId())) {
+                    return teacher.convert();
+                }
+
+        }
+//            return new TeacherDto();
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+              "Teacher with id " + id + " not found");
+    }
+
     @PostMapping("/add")
     public String add(@RequestBody TeacherDto teacherDto) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        if (teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
+        if (teacherDto.getFirstName()==null || teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
                 teacherDto.getFirstName().length() > 50) {
-            return  "First name must be 2-50 characters and contain";
+            return "Fail! First name must be 2-50 characters and contain";
         }
-        if (teacherDto.getLastName().isEmpty() || teacherDto.getLastName().length() < 2 ||
+        if (teacherDto.getLastName()== null || teacherDto.getLastName().isEmpty() || teacherDto.getLastName().length() < 2 ||
                 teacherDto.getLastName().length() > 50) {
-            return "Last name must be 2-50 characters and contain only letters";
+            return "Fail! Last name must be 2-50 characters and contain only letters";
         }
-        if (teacherDto.getSubject().isEmpty()) {
-            return "Subject is required";
+        if ( teacherDto.getSubject() == null || teacherDto.getSubject().isEmpty()) {
+            return "Fail! Subject is required";
         }
         if (teacherDto.getExperience() < 0 || teacherDto.getExperience() > 50) {
-            return "Experience must be between 0 and 50 years";
+            return "Fail! Experience must be between 0 and 50 years";
         }
         if (teacherDto.getSalary() < 0 || teacherDto.getSalary() > 100000) {
-            return "Salary must be between 0 and 100000";
+            return "Fail! Salary must be between 0 and 100000";
         }
-        if (teacherDto.getEmail() == null && teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
-        } else if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) &&
-                teachers.stream().anyMatch(teacher -> teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()))) {
-            teachers.add(teacherDto.convert());
-            return "success";
+        if (teacherDto.getEmail() == null || teacherDto.getEmail().isEmpty() || !teacherDto.getEmail().matches(emailRegex)) {
+            return "Fail! Invalid email format";
         }
-        return "fail";
+        if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
+                 teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()))) {
+            return "Fail! Teacher with this name already exists";
+        }
+        teachers.add(teacherDto.convert());
+        return "success";
     }
+
+
 
 
 }

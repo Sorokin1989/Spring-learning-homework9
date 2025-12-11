@@ -21,6 +21,9 @@ public class TeacherDto {
     private String email;
     private  Boolean isActive;
 
+    public TeacherDto() {
+    }
+
     public TeacherDto(String firstName, String lastName, String subject, Integer experience, Double salary, String email, Boolean isActive) {
         this.firstName = firstName;
         this.lastName = lastName;
