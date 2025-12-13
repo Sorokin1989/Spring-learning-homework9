@@ -7,7 +7,10 @@ import ru.top.homework9.dto.TeacherDto;
 import ru.top.homework9.models.Teacher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -124,8 +127,19 @@ public Integer getCount(){
         }
         else
             return 0;
-
 }
+
+@GetMapping("/count-by-subject")
+public Map<String,Integer>countBySubject(){
+        if (teachers==null){
+            return new HashMap<>();
+        }
+
+            return teachers.stream().filter(teacher -> teacher!=null && teacher.getSubject()!=null).collect(Collectors.toMap(teacher -> teacher.getSubject(),
+                    teacher -> 1,(a,b)->a+b));
+}
+
+
 
     @PostMapping("/add")
     public String add(@RequestBody TeacherDto teacherDto) {
