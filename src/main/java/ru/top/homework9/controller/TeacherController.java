@@ -6,10 +6,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.top.homework9.dto.TeacherDto;
 import ru.top.homework9.models.Teacher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -17,7 +14,7 @@ import java.util.stream.Collectors;
 public class TeacherController {
 
     List<Teacher> teachers;
-    List<TeacherDto> teacherDtos;
+//    List<TeacherDto> teacherDtos;
 
     public TeacherController() {
         teachers = new ArrayList<>();
@@ -175,30 +172,74 @@ public class TeacherController {
 
     @PostMapping("/add-bulk")
     public String addAll(@RequestBody List<TeacherDto> newTeacherDto) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
-        if (teacherDtos == null) {
-            teacherDtos = new ArrayList<>();
+        if (teachers == null) {
+            teachers = new ArrayList<>();
         }
-
-
-        if (newTeacherDto==null){
+        if (newTeacherDto == null) {
             return "Error! Request body is null";
         }
-        if (newTeacherDto.isEmpty()){
+        if (newTeacherDto.isEmpty()) {
             return "Error! Empty list";
         }
 
-       List<TeacherDto> filterNewTeacherDto= newTeacherDto.stream().filter(teacherDto -> teacherDto!=null).toList();
-        if(filterNewTeacherDto.isEmpty()){
-            return "Error! All teachers in the list are null";
+        Set<String> names=teachers.stream().map(teacher -> teacher.getFirstName().toLowerCase() + " " + teacher.getLastName().toLowerCase()).collect(Collectors.toSet());
+
+        Set<String>batchNames=new HashSet<>();
+
+
+        List<Teacher> filterNewTeacherDto = newTeacherDto.stream().filter(teacherDto -> teacherDto != null).
+                filter(teacherDto -> {
+
+                    if (teacherDto.getFirstName() == null || teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
+                            teacherDto.getFirstName().length() > 50) {
+                        return false;
+                    }
+                    if (teacherDto.getLastName() == null || teacherDto.getLastName().isEmpty() || teacherDto.getLastName().length() < 2 ||
+                            teacherDto.getLastName().length() > 50) {
+                        return false;
+                    }
+
+//                    if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
+//                            teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()))) {
+//                        return false;
+//                    }
+
+
+                    if (teacherDto.getSubject() == null || teacherDto.getSubject().isEmpty()) {
+                        return false;
+                    }
+                    if (teacherDto.getExperience() < 0 || teacherDto.getExperience() > 50) {
+                        return false;
+                    }
+                    if (teacherDto.getSalary() < 0 || teacherDto.getSalary() > 100000) {
+                        return false;
+                    }
+                    if (teacherDto.getEmail() == null || teacherDto.getEmail().isEmpty() || !teacherDto.getEmail().matches(emailRegex)) {
+                        return false;
+                    }
+
+                    String nameKey=teacherDto.getFirstName().toLowerCase() + " " + teacherDto.getLastName().toLowerCase();
+
+                    if (names.contains(nameKey)) {
+                        return false;
+                    }
+
+                    batchNames.add(nameKey);
+                   names.add(nameKey);
+                   return true;
+                }).map(teacherDto -> teacherDto.convert()).toList();
+
+
+        if (filterNewTeacherDto.isEmpty()) {
+            return "Error! No valid teachers found after validation";
         }
 
-            int count = filterNewTeacherDto.size();
+        int count = filterNewTeacherDto.size();
 
-            teacherDtos.addAll(filterNewTeacherDto);
-            return "Added " + count + " teachers";
-
-
+        teachers.addAll(filterNewTeacherDto);
+        return "Added " + count + " teachers";
 
 
     }
