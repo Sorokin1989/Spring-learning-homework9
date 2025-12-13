@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class TeacherController {
 
     List<Teacher> teachers;
+    List<TeacherDto> teacherDtos;
 
     public TeacherController() {
         teachers = new ArrayList<>();
@@ -80,7 +81,7 @@ public class TeacherController {
             @RequestParam(required = false) Double minSalary,
             @RequestParam(required = false) Double maxSalary
     ) {
-        if (minExp==null && maxExp ==null && minSalary==null && maxSalary==null){
+        if (minExp == null && maxExp == null && minSalary == null && maxSalary == null) {
             return new ArrayList<>();
         }
         if ((minExp != null && maxExp != null && minExp > maxExp) || (minSalary != null && maxSalary != null && minSalary > maxSalary)) {
@@ -115,30 +116,30 @@ public class TeacherController {
         }).map(teacher -> teacher.convert()).toList();
 
     }
-@GetMapping("/active")
-    public List<TeacherDto>getActiveTeachers(){
-        return teachers.stream().filter(teacher -> teacher.getActive()==true).map(teacher -> teacher.convert()).toList();
+
+    @GetMapping("/active")
+    public List<TeacherDto> getActiveTeachers() {
+        return teachers.stream().filter(teacher -> teacher.getActive() == true).map(teacher -> teacher.convert()).toList();
 
     }
-    @GetMapping("/count")
-public Integer getCount(){
-        if (teachers!=null && !teachers.isEmpty()){
-     return teachers.size();
-        }
-        else
-            return 0;
-}
 
-@GetMapping("/count-by-subject")
-public Map<String,Integer>countBySubject(){
-        if (teachers==null){
+    @GetMapping("/count")
+    public Integer getCount() {
+        if (teachers != null && !teachers.isEmpty()) {
+            return teachers.size();
+        } else
+            return 0;
+    }
+
+    @GetMapping("/count-by-subject")
+    public Map<String, Integer> countBySubject() {
+        if (teachers == null) {
             return new HashMap<>();
         }
 
-            return teachers.stream().filter(teacher -> teacher!=null && teacher.getSubject()!=null).collect(Collectors.toMap(teacher -> teacher.getSubject(),
-                    teacher -> 1,(a,b)->a+b));
-}
-
+        return teachers.stream().filter(teacher -> teacher != null && teacher.getSubject() != null).collect(Collectors.toMap(teacher -> teacher.getSubject(),
+                teacher -> 1, (a, b) -> a + b));
+    }
 
 
     @PostMapping("/add")
@@ -170,6 +171,36 @@ public Map<String,Integer>countBySubject(){
         }
         teachers.add(teacherDto.convert());
         return "success";
+    }
+
+    @PostMapping("/add-bulk")
+    public String addAll(@RequestBody List<TeacherDto> newTeacherDto) {
+
+        if (teacherDtos == null) {
+            teacherDtos = new ArrayList<>();
+        }
+
+
+        if (newTeacherDto==null){
+            return "Error! Request body is null";
+        }
+        if (newTeacherDto.isEmpty()){
+            return "Error! Empty list";
+        }
+
+       List<TeacherDto> filterNewTeacherDto= newTeacherDto.stream().filter(teacherDto -> teacherDto!=null).toList();
+        if(filterNewTeacherDto.isEmpty()){
+            return "Error! All teachers in the list are null";
+        }
+
+            int count = filterNewTeacherDto.size();
+
+            teacherDtos.addAll(filterNewTeacherDto);
+            return "Added " + count + " teachers";
+
+
+
+
     }
 
 
