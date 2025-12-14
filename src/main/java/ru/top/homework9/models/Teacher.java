@@ -11,7 +11,7 @@ public class Teacher {
     //salary: Double (Зарплата)
     //email: String (Email)
     //isActive: Boolean (Активен/уволен)
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String subject;
@@ -32,11 +32,11 @@ public class Teacher {
         this.isActive = isActive;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -183,12 +183,8 @@ public class TeacherController {
         if (newTeacherDto.isEmpty()) {
             return "Error! Empty list";
         }
-
-        Set<String> names=teachers.stream().map(teacher -> teacher.getFirstName().toLowerCase() + " " + teacher.getLastName().toLowerCase()).collect(Collectors.toSet());
-
-        Set<String>batchNames=new HashSet<>();
-
-
+        Set<String> names = teachers.stream().map(teacher -> teacher.getFirstName().toLowerCase() + " " + teacher.getLastName().toLowerCase()).collect(Collectors.toSet());
+        Set<String> batchNames = new HashSet<>();
         List<Teacher> filterNewTeacherDto = newTeacherDto.stream().filter(teacherDto -> teacherDto != null).
                 filter(teacherDto -> {
 
@@ -206,7 +202,6 @@ public class TeacherController {
 //                        return false;
 //                    }
 
-
                     if (teacherDto.getSubject() == null || teacherDto.getSubject().isEmpty()) {
                         return false;
                     }
@@ -220,15 +215,15 @@ public class TeacherController {
                         return false;
                     }
 
-                    String nameKey=teacherDto.getFirstName().toLowerCase() + " " + teacherDto.getLastName().toLowerCase();
+                    String nameKey = teacherDto.getFirstName().toLowerCase() + " " + teacherDto.getLastName().toLowerCase();
 
                     if (names.contains(nameKey)) {
                         return false;
                     }
 
                     batchNames.add(nameKey);
-                   names.add(nameKey);
-                   return true;
+                    names.add(nameKey);
+                    return true;
                 }).map(teacherDto -> teacherDto.convert()).toList();
 
 
@@ -244,6 +239,78 @@ public class TeacherController {
 
     }
 
+    @PutMapping("/update/{id}")
+    public String updateAll(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
+
+        if (teachers == null) {
+            return "Error! Teachers list is not initialized";
+        }
+
+        if (teacherDto == null) {
+            return "Error! Request body is null";
+        }
+        if (id == null || id < 0) {
+            return "Error! Invalid id";
+        }
+        Teacher updateTeacher = teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+
+        if (updateTeacher == null) {
+            return "Teacher with id " + id + " not found";
+        }
+
+
+        boolean wasUpdated = false;
+
+        if (teacherDto.getFirstName() != null && !teacherDto.getFirstName().isEmpty() && teacherDto.getFirstName().length() >= 2 &&
+                teacherDto.getFirstName().length() <= 50) {
+            updateTeacher.setFirstName(teacherDto.getFirstName());
+            wasUpdated = true;
+        }
+        if (teacherDto.getLastName() != null && !teacherDto.getLastName().isEmpty() && teacherDto.getLastName().length() >= 2 &&
+                teacherDto.getLastName().length() <= 50) {
+            updateTeacher.setLastName(teacherDto.getLastName());
+            wasUpdated = true;
+        }
+
+//                    if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
+//                            teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()))) {
+//                        return false;
+//                    }
+
+        if (teacherDto.getSubject() != null && !teacherDto.getSubject().isEmpty()) {
+            updateTeacher.setSubject(teacherDto.getSubject());
+            wasUpdated = true;
+        }
+        if (teacherDto.getExperience() != null && teacherDto.getExperience() >= 0 && teacherDto.getExperience() <= 50) {
+            updateTeacher.setExperience(teacherDto.getExperience());
+            wasUpdated = true;
+        }
+        if (teacherDto.getSalary() != null && teacherDto.getSalary() > 0 && teacherDto.getSalary() < 100000) {
+            updateTeacher.setSalary(teacherDto.getSalary());
+            wasUpdated = true;
+        }
+        if (teacherDto.getEmail() != null && !teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
+            updateTeacher.setEmail(teacherDto.getEmail());
+            wasUpdated = true;
+        }
+        if (wasUpdated) {
+            return "success";
+        } else
+            return "fail";
+
+    }
+
 
 }
+
+
+
+
+
+
+
+
+
 
