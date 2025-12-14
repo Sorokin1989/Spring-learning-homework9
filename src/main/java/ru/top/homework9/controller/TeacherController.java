@@ -261,17 +261,24 @@ public class TeacherController {
         }
 
 
-        boolean wasUpdated = false;
 
-        if (teacherDto.getFirstName() != null && !teacherDto.getFirstName().isEmpty() && teacherDto.getFirstName().length() >= 2 &&
-                teacherDto.getFirstName().length() <= 50) {
-            updateTeacher.setFirstName(teacherDto.getFirstName());
-            wasUpdated = true;
+
+        if (teacherDto.getFirstName() == null || teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
+                teacherDto.getFirstName().length() > 50) {
+return "Fail! First name must be 2-50 characters";
         }
-        if (teacherDto.getLastName() != null && !teacherDto.getLastName().isEmpty() && teacherDto.getLastName().length() >= 2 &&
-                teacherDto.getLastName().length() <= 50) {
-            updateTeacher.setLastName(teacherDto.getLastName());
-            wasUpdated = true;
+//            if (updateTeacher.getFirstName()==null||!updateTeacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) {
+//
+//            wasUpdated = true;
+//            }
+//        }
+        if (teacherDto.getLastName() == null || teacherDto.getLastName().isEmpty() || teacherDto.getLastName().length() < 2 ||
+                teacherDto.getLastName().length() > 50) {
+            return "Fail! Last name must be 2-50 characters";
+//            if(updateTeacher.getLastName()==null||!updateTeacher.getLastName().equalsIgnoreCase(teacherDto.getLastName())) {
+//
+//            wasUpdated = true;
+//            }
         }
 
 //                    if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
@@ -279,28 +286,85 @@ public class TeacherController {
 //                        return false;
 //                    }
 
-        if (teacherDto.getSubject() != null && !teacherDto.getSubject().isEmpty()) {
-            updateTeacher.setSubject(teacherDto.getSubject());
-            wasUpdated = true;
+        if (teacherDto.getSubject() == null || teacherDto.getSubject().isEmpty()) {
+            return "Fail! Subject is required";
+
+//            if(updateTeacher.getSubject()==null||!updateTeacher.getSubject().equalsIgnoreCase(teacherDto.getSubject())) {
+//
+//            wasUpdated = true;
+//            }
         }
-        if (teacherDto.getExperience() != null && teacherDto.getExperience() >= 0 && teacherDto.getExperience() <= 50) {
-            updateTeacher.setExperience(teacherDto.getExperience());
-            wasUpdated = true;
+        if (teacherDto.getExperience() == null || teacherDto.getExperience() < 0 || teacherDto.getExperience() > 50) {
+            return "Fail! Experience must be between 0 and 50 years";
+//            if(updateTeacher.getExperience()==null||!updateTeacher.getExperience().equals(teacherDto.getExperience())) {
+//
+//            wasUpdated = true;
+//            }
         }
-        if (teacherDto.getSalary() != null && teacherDto.getSalary() > 0 && teacherDto.getSalary() < 100000) {
-            updateTeacher.setSalary(teacherDto.getSalary());
-            wasUpdated = true;
+        if (teacherDto.getSalary() == null || teacherDto.getSalary() < 0 || teacherDto.getSalary() > 100000) {
+            return "Fail! Salary must be between 0 and 100000";
+//            if(updateTeacher.getSalary()==null||!updateTeacher.getSalary().equals(teacherDto.getSalary())) {
+//
+//            wasUpdated = true;
+//            }
         }
-        if (teacherDto.getEmail() != null && !teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
-            updateTeacher.setEmail(teacherDto.getEmail());
-            wasUpdated = true;
+        if (teacherDto.getEmail() == null || teacherDto.getEmail().isEmpty() || !teacherDto.getEmail().matches(emailRegex)) {
+            return "Fail! Invalid email format";
+//            if(updateTeacher.getEmail()==null||!updateTeacher.getEmail().equals(teacherDto.getEmail())) {
+//
+//            wasUpdated = true;
+//            }
         }
-        if (wasUpdated) {
+
+        if(teacherDto.getActive()==null){
+            return "Fail! Active is null";
+        }
+
+
+
+        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher->teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())&&
+                teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
+
+        if(duplicateName){
+            return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
+                    teacherDto.getLastName() + " already exists";
+        }
+        updateTeacher.setFirstName(teacherDto.getFirstName());
+        updateTeacher.setLastName(teacherDto.getLastName());
+        updateTeacher.setSubject(teacherDto.getSubject());
+        updateTeacher.setExperience(teacherDto.getExperience());
+        updateTeacher.setSalary(teacherDto.getSalary());
+        updateTeacher.setEmail(teacherDto.getEmail());
+        updateTeacher.setActive(teacherDto.getActive());
+
             return "success";
-        } else
-            return "fail";
+
+
 
     }
+
+@PatchMapping("/update-partial/{id} ")
+    public String updatePartial(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
+        if (teachers == null) {
+            return "Error! Teachers list is not initialized";
+        }
+        if (teacherDto == null) {
+            return "Error! Request body is null";
+        }
+        if (id == null || id < 0) {
+            return "Error! Invalid id";
+        }
+
+       Teacher updateTeacher= teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+        if (updateTeacher == null) {
+            return "Error! Teacher with id " + id + " not found";
+        }
+    boolean wasUpdated = false;
+
+
+
+}
+
 
 
 }
