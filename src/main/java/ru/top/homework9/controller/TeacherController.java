@@ -343,8 +343,9 @@ return "Fail! First name must be 2-50 characters";
 
     }
 
-@PatchMapping("/update-partial/{id} ")
+@PatchMapping("/update-partial/{id}")
     public String updatePartial(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
+    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (teachers == null) {
             return "Error! Teachers list is not initialized";
         }
@@ -359,7 +360,95 @@ return "Fail! First name must be 2-50 characters";
         if (updateTeacher == null) {
             return "Error! Teacher with id " + id + " not found";
         }
+
+
+
+
+
+
+
     boolean wasUpdated = false;
+
+
+
+
+
+    if (teacherDto.getFirstName() != null && !teacherDto.getFirstName().isEmpty() && teacherDto.getFirstName().length() >= 2 &&
+            teacherDto.getFirstName().length() <= 50) {
+        if (updateTeacher.getFirstName()==null||!updateTeacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) {
+            updateTeacher.setFirstName(teacherDto.getFirstName());
+            wasUpdated = true;
+        }
+
+    }
+
+    if (teacherDto.getLastName() != null && !teacherDto.getLastName().isEmpty() && teacherDto.getLastName().length() >= 2 &&
+            teacherDto.getLastName().length() <= 50) {
+            if(updateTeacher.getLastName()==null||!updateTeacher.getLastName().equalsIgnoreCase(teacherDto.getLastName())) {
+                updateTeacher.setLastName(teacherDto.getLastName());
+           wasUpdated = true;
+            }
+
+    }
+
+
+    if (teacherDto.getFirstName() != null && teacherDto.getLastName()!=null) {
+        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher-> teacher.getFirstName()!=null&&teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
+                && teacher.getLastName()!=null&&teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
+
+        if(duplicateName){
+            return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
+                    teacherDto.getLastName() + " already exists";
+        }
+    }
+
+
+
+
+
+
+
+
+//                    if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
+//                            teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()))) {
+//                        return false;
+//                    }
+
+    if (teacherDto.getSubject() != null && !teacherDto.getSubject().isEmpty()) {
+        if(updateTeacher.getSubject()==null||!updateTeacher.getSubject().equalsIgnoreCase(teacherDto.getSubject())) {
+            updateTeacher.setSubject(teacherDto.getSubject());
+           wasUpdated = true;
+            }
+
+
+    }
+    if (teacherDto.getExperience() != null && teacherDto.getExperience() >= 0 && teacherDto.getExperience() <= 50) {
+            if(updateTeacher.getExperience()==null||!updateTeacher.getExperience().equals(teacherDto.getExperience())) {
+updateTeacher.setExperience(teacherDto.getExperience());
+            wasUpdated = true;
+            }
+    }
+    if (teacherDto.getSalary() != null && teacherDto.getSalary() >= 0 && teacherDto.getSalary() <= 100000) {
+            if(updateTeacher.getSalary()==null||!updateTeacher.getSalary().equals(teacherDto.getSalary())) {
+                updateTeacher.setSalary(teacherDto.getSalary());
+            wasUpdated = true;
+            }
+    }
+    if (teacherDto.getEmail() != null && !teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
+            if(updateTeacher.getEmail()==null||!updateTeacher.getEmail().equals(teacherDto.getEmail())) {
+updateTeacher.setEmail(teacherDto.getEmail());
+            wasUpdated = true;
+            }
+    }
+    if(teacherDto.getActive()!=null&&!updateTeacher.getActive().equals(teacherDto.getActive())){
+   updateTeacher.setActive(teacherDto.getActive());
+   wasUpdated=true;
+    }
+
+    if(wasUpdated){
+        return "success";
+    }
+    return "fail";
 
 
 
