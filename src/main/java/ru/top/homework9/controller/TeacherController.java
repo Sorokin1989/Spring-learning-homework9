@@ -322,13 +322,21 @@ return "Fail! First name must be 2-50 characters";
 
 
 
-        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher->teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())&&
-                teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
+        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher->teacher.getFirstName()!=null&&teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
+                && teacher.getLastName()!=null&&teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
 
         if(duplicateName){
             return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
                     teacherDto.getLastName() + " already exists";
         }
+
+
+
+       boolean duplicateEmail= teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher -> teacher.getEmail()!=null&&teacher.getEmail().equalsIgnoreCase(teacherDto.getEmail()));
+     if(duplicateEmail){
+         return "Error! Teacher with email " + teacherDto.getEmail() + " already exists";
+     }
+
         updateTeacher.setFirstName(teacherDto.getFirstName());
         updateTeacher.setLastName(teacherDto.getLastName());
         updateTeacher.setSubject(teacherDto.getSubject());
