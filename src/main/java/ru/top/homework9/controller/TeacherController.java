@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/teacher")
 public class TeacherController {
 
-    List<Teacher> teachers;
+   private List<Teacher> teachers;
+   private static String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 //    List<TeacherDto> teacherDtos;
 
     public TeacherController() {
@@ -141,7 +142,7 @@ public class TeacherController {
 
     @PostMapping("/add")
     public String add(@RequestBody TeacherDto teacherDto) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+//        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (teacherDto.getFirstName() == null || teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
                 teacherDto.getFirstName().length() > 50) {
             return "Fail! First name must be 2-50 characters and contain";
@@ -172,7 +173,7 @@ public class TeacherController {
 
     @PostMapping("/add-bulk")
     public String addAll(@RequestBody List<TeacherDto> newTeacherDto) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+//        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
         if (teachers == null) {
             teachers = new ArrayList<>();
@@ -241,7 +242,7 @@ public class TeacherController {
 
     @PutMapping("/update/{id}")
     public String updateAll(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+//        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
 
         if (teachers == null) {
@@ -353,7 +354,7 @@ return "Fail! First name must be 2-50 characters";
 
 @PatchMapping("/update-partial/{id}")
     public String updatePartial(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
-    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+//    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (teachers == null) {
             return "Error! Teachers list is not initialized";
         }
@@ -461,6 +462,33 @@ updateTeacher.setEmail(teacherDto.getEmail());
 
 
 }
+@PatchMapping("/deactivate/{id}")
+public String deactivateTeacher(@PathVariable Integer id) {
+        if (teachers == null) {
+            return "Error! Teachers list is not initialized";
+        }
+        if(id == null || id < 0) {
+            return "Error! Invalid id";
+        }
+
+        Teacher findTeacher=teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+        if (findTeacher == null) {
+            return "Error! Teacher with id " + id + " not found";
+        }
+        if (findTeacher.getActive()!=null&&findTeacher.getActive().equals(true)){
+            findTeacher.setActive(false);
+            return "success";
+        }
+
+        return "fail";
+}
+
+
+
+
+
+
+
 
 
 
