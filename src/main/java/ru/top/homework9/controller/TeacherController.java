@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/teacher")
 public class TeacherController {
 
-   private List<Teacher> teachers;
-   private static String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    private List<Teacher> teachers;
+    private static String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 //    List<TeacherDto> teacherDtos;
 
     public TeacherController() {
@@ -262,11 +262,9 @@ public class TeacherController {
         }
 
 
-
-
         if (teacherDto.getFirstName() == null || teacherDto.getFirstName().isEmpty() || teacherDto.getFirstName().length() < 2 ||
                 teacherDto.getFirstName().length() > 50) {
-return "Fail! First name must be 2-50 characters";
+            return "Fail! First name must be 2-50 characters";
         }
 //            if (updateTeacher.getFirstName()==null||!updateTeacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) {
 //
@@ -317,26 +315,24 @@ return "Fail! First name must be 2-50 characters";
 //            }
         }
 
-        if(teacherDto.getActive()==null){
+        if (teacherDto.getActive() == null) {
             return "Fail! Active is null";
         }
 
 
+        boolean duplicateName = teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher -> teacher.getFirstName() != null && teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
+                && teacher.getLastName() != null && teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
 
-        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher->teacher.getFirstName()!=null&&teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
-                && teacher.getLastName()!=null&&teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
-
-        if(duplicateName){
+        if (duplicateName) {
             return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
                     teacherDto.getLastName() + " already exists";
         }
 
 
-
-       boolean duplicateEmail= teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher -> teacher.getEmail()!=null&&teacher.getEmail().equalsIgnoreCase(teacherDto.getEmail()));
-     if(duplicateEmail){
-         return "Error! Teacher with email " + teacherDto.getEmail() + " already exists";
-     }
+        boolean duplicateEmail = teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher -> teacher.getEmail() != null && teacher.getEmail().equalsIgnoreCase(teacherDto.getEmail()));
+        if (duplicateEmail) {
+            return "Error! Teacher with email " + teacherDto.getEmail() + " already exists";
+        }
 
         updateTeacher.setFirstName(teacherDto.getFirstName());
         updateTeacher.setLastName(teacherDto.getLastName());
@@ -346,13 +342,12 @@ return "Fail! First name must be 2-50 characters";
         updateTeacher.setEmail(teacherDto.getEmail());
         updateTeacher.setActive(teacherDto.getActive());
 
-            return "success";
-
+        return "success";
 
 
     }
 
-@PatchMapping("/update-partial/{id}")
+    @PatchMapping("/update-partial/{id}")
     public String updatePartial(@RequestBody TeacherDto teacherDto, @PathVariable Integer id) {
 //    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (teachers == null) {
@@ -365,57 +360,43 @@ return "Fail! First name must be 2-50 characters";
             return "Error! Invalid id";
         }
 
-       Teacher updateTeacher= teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+        Teacher updateTeacher = teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
         if (updateTeacher == null) {
             return "Error! Teacher with id " + id + " not found";
         }
 
 
+        boolean wasUpdated = false;
 
 
-
-
-
-    boolean wasUpdated = false;
-
-
-
-
-
-    if (teacherDto.getFirstName() != null && !teacherDto.getFirstName().isEmpty() && teacherDto.getFirstName().length() >= 2 &&
-            teacherDto.getFirstName().length() <= 50) {
-        if (updateTeacher.getFirstName()==null||!updateTeacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) {
-            updateTeacher.setFirstName(teacherDto.getFirstName());
-            wasUpdated = true;
-        }
-
-    }
-
-    if (teacherDto.getLastName() != null && !teacherDto.getLastName().isEmpty() && teacherDto.getLastName().length() >= 2 &&
-            teacherDto.getLastName().length() <= 50) {
-            if(updateTeacher.getLastName()==null||!updateTeacher.getLastName().equalsIgnoreCase(teacherDto.getLastName())) {
-                updateTeacher.setLastName(teacherDto.getLastName());
-           wasUpdated = true;
+        if (teacherDto.getFirstName() != null && !teacherDto.getFirstName().isEmpty() && teacherDto.getFirstName().length() >= 2 &&
+                teacherDto.getFirstName().length() <= 50) {
+            if (updateTeacher.getFirstName() == null || !updateTeacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())) {
+                updateTeacher.setFirstName(teacherDto.getFirstName());
+                wasUpdated = true;
             }
 
-    }
-
-
-    if (teacherDto.getFirstName() != null && teacherDto.getLastName()!=null) {
-        boolean duplicateName=teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher-> teacher.getFirstName()!=null&&teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
-                && teacher.getLastName()!=null&&teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
-
-        if(duplicateName){
-            return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
-                    teacherDto.getLastName() + " already exists";
         }
-    }
+
+        if (teacherDto.getLastName() != null && !teacherDto.getLastName().isEmpty() && teacherDto.getLastName().length() >= 2 &&
+                teacherDto.getLastName().length() <= 50) {
+            if (updateTeacher.getLastName() == null || !updateTeacher.getLastName().equalsIgnoreCase(teacherDto.getLastName())) {
+                updateTeacher.setLastName(teacherDto.getLastName());
+                wasUpdated = true;
+            }
+
+        }
 
 
+        if (teacherDto.getFirstName() != null && teacherDto.getLastName() != null) {
+            boolean duplicateName = teachers.stream().filter(teacher -> !teacher.getId().equals(id)).anyMatch(teacher -> teacher.getFirstName() != null && teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName())
+                    && teacher.getLastName() != null && teacher.getLastName().equalsIgnoreCase(teacherDto.getLastName()));
 
-
-
-
+            if (duplicateName) {
+                return "Error! Teacher with name " + teacherDto.getFirstName() + " " +
+                        teacherDto.getLastName() + " already exists";
+            }
+        }
 
 
 //                    if (teachers.stream().anyMatch(teacher -> teacher.getFirstName().equalsIgnoreCase(teacherDto.getFirstName()) &&
@@ -423,65 +404,118 @@ return "Fail! First name must be 2-50 characters";
 //                        return false;
 //                    }
 
-    if (teacherDto.getSubject() != null && !teacherDto.getSubject().isEmpty()) {
-        if(updateTeacher.getSubject()==null||!updateTeacher.getSubject().equalsIgnoreCase(teacherDto.getSubject())) {
-            updateTeacher.setSubject(teacherDto.getSubject());
-           wasUpdated = true;
+        if (teacherDto.getSubject() != null && !teacherDto.getSubject().isEmpty()) {
+            if (updateTeacher.getSubject() == null || !updateTeacher.getSubject().equalsIgnoreCase(teacherDto.getSubject())) {
+                updateTeacher.setSubject(teacherDto.getSubject());
+                wasUpdated = true;
             }
 
 
-    }
-    if (teacherDto.getExperience() != null && teacherDto.getExperience() >= 0 && teacherDto.getExperience() <= 50) {
-            if(updateTeacher.getExperience()==null||!updateTeacher.getExperience().equals(teacherDto.getExperience())) {
-updateTeacher.setExperience(teacherDto.getExperience());
-            wasUpdated = true;
+        }
+        if (teacherDto.getExperience() != null && teacherDto.getExperience() >= 0 && teacherDto.getExperience() <= 50) {
+            if (updateTeacher.getExperience() == null || !updateTeacher.getExperience().equals(teacherDto.getExperience())) {
+                updateTeacher.setExperience(teacherDto.getExperience());
+                wasUpdated = true;
             }
-    }
-    if (teacherDto.getSalary() != null && teacherDto.getSalary() >= 0 && teacherDto.getSalary() <= 100000) {
-            if(updateTeacher.getSalary()==null||!updateTeacher.getSalary().equals(teacherDto.getSalary())) {
+        }
+        if (teacherDto.getSalary() != null && teacherDto.getSalary() >= 0 && teacherDto.getSalary() <= 100000) {
+            if (updateTeacher.getSalary() == null || !updateTeacher.getSalary().equals(teacherDto.getSalary())) {
                 updateTeacher.setSalary(teacherDto.getSalary());
-            wasUpdated = true;
+                wasUpdated = true;
             }
-    }
-    if (teacherDto.getEmail() != null && !teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
-            if(updateTeacher.getEmail()==null||!updateTeacher.getEmail().equals(teacherDto.getEmail())) {
-updateTeacher.setEmail(teacherDto.getEmail());
-            wasUpdated = true;
+        }
+        if (teacherDto.getEmail() != null && !teacherDto.getEmail().isEmpty() && teacherDto.getEmail().matches(emailRegex)) {
+            if (updateTeacher.getEmail() == null || !updateTeacher.getEmail().equals(teacherDto.getEmail())) {
+                updateTeacher.setEmail(teacherDto.getEmail());
+                wasUpdated = true;
             }
+        }
+        if (teacherDto.getActive() != null && !updateTeacher.getActive().equals(teacherDto.getActive())) {
+            updateTeacher.setActive(teacherDto.getActive());
+            wasUpdated = true;
+        }
+
+        if (wasUpdated) {
+            return "success";
+        }
+        return "fail";
+
+
     }
-    if(teacherDto.getActive()!=null&&!updateTeacher.getActive().equals(teacherDto.getActive())){
-   updateTeacher.setActive(teacherDto.getActive());
-   wasUpdated=true;
-    }
 
-    if(wasUpdated){
-        return "success";
-    }
-    return "fail";
-
-
-
-}
-@PatchMapping("/deactivate/{id}")
-public String deactivateTeacher(@PathVariable Integer id) {
+    @PatchMapping("/deactivate/{id}")
+    public String deactivateTeacher(@PathVariable Integer id) {
         if (teachers == null) {
             return "Error! Teachers list is not initialized";
         }
-        if(id == null || id < 0) {
+        if (id == null || id < 0) {
             return "Error! Invalid id";
         }
 
-        Teacher findTeacher=teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+        Teacher findTeacher = teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
         if (findTeacher == null) {
             return "Error! Teacher with id " + id + " not found";
         }
-        if (findTeacher.getActive()!=null&&findTeacher.getActive().equals(true)){
+        if (findTeacher.getActive() != null && findTeacher.getActive().equals(true)) {
             findTeacher.setActive(false);
             return "success";
         }
 
         return "fail";
-}
+    }
+
+    @PatchMapping("/activate/{id}")
+    public String activateTeacher(@PathVariable Integer id) {
+        if (teachers == null) {
+            return "Error! Teachers list is not initialized";
+        }
+        if (id == null || id < 0) {
+            return "Error! Invalid id";
+        }
+        Teacher findTeacher = teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+
+        if (findTeacher == null) {
+            return "Error! Teacher with id " + id + " not found";
+        }
+        if (findTeacher.getActive() != null && findTeacher.getActive().equals(false)) {
+            findTeacher.setActive(true);
+            return "success";
+        }
+        return "fail";
+    }
+
+    @PatchMapping("/increase-salary/{id}")
+    public String increaseSalary(@PathVariable Integer id,
+                                 @RequestParam Integer percent) {
+        if (teachers == null) {
+            return "Error! Teachers list is not initialized";
+        }
+        if (id == null || id < 0) {
+            return "Error! Invalid id";
+        }
+
+        Teacher findTeacher = teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+        if (findTeacher == null) {
+            return "Error! Teacher with id " + id + " not found";
+        }
+        if (percent == null || percent <= 0 || percent > 100) {
+            return "Error! Invalid percent";
+        }
+        Double salary = findTeacher.getSalary();
+        if (salary == null) {
+            return "Error! Teacher salary is not set";
+        }
+        if (salary<0 || salary>100000){
+            return "Error! Current salary is invalid";
+        }
+            Double newSalary = salary + (salary * (percent / 100.0));
+            if (newSalary > 100000) {
+                return "Fail! Salary is too big";
+            }
+            findTeacher.setSalary(newSalary);
+            return "success";
+        }
+    }
 
 
 
@@ -492,7 +526,8 @@ public String deactivateTeacher(@PathVariable Integer id) {
 
 
 
-}
+
+
 
 
 
