@@ -505,17 +505,69 @@ public class TeacherController {
         if (salary == null) {
             return "Error! Teacher salary is not set";
         }
-        if (salary<0 || salary>100000){
+        if (salary < 0 || salary > 100000) {
             return "Error! Current salary is invalid";
         }
-            Double newSalary = salary + (salary * (percent / 100.0));
-            if (newSalary > 100000) {
-                return "Fail! Salary is too big";
-            }
-            findTeacher.setSalary(newSalary);
-            return "success";
+        Double newSalary = salary + (salary * (percent / 100.0));
+        if (newSalary > 100000) {
+            return "Fail! Salary is too big";
         }
+        findTeacher.setSalary(newSalary);
+        return "success";
     }
+
+    @DeleteMapping("/delete/{id}")
+    public boolean deleteById(@PathVariable Integer id) {
+        if (teachers == null) {
+            return false;
+        }
+        if (id == null || id < 0) {
+            return false;
+        }
+//        Teacher findTeacher=teachers.stream().filter(teacher -> id.equals(teacher.getId())).findFirst().orElse(null);
+//        if (findTeacher == null) {
+//            return false;
+//        }
+
+        return teachers.removeIf(teacher -> id.equals(teacher.getId()));
+
+
+//      teachers.remove(findTeacher);
+//        return true;
+
+    }
+
+
+    @DeleteMapping("/delete-by-subject/{subject}")
+    public Integer deleteBySubject(@PathVariable String subject) {
+        if (teachers == null) {
+            return 0;
+        }
+        if (subject == null || subject.isEmpty()) {
+            return 0;
+        }
+
+
+       Integer count= Math.toIntExact(teachers.stream().filter(teacher -> teacher.getSubject()!=null&&subject.equalsIgnoreCase(teacher.getSubject())).count());
+
+        teachers.removeIf(teacher ->teacher.getSubject()!=null&& subject.equalsIgnoreCase(teacher.getSubject()));
+
+
+        return count;
+    }
+
+    @DeleteMapping("/delete-inactive")
+    public Integer deleteInactive(){
+        if (teachers == null) {
+            return 0;
+        }
+        List<Teacher> deleteTeachers=teachers.stream().filter(teacher -> teacher.getActive() != null && teacher.getActive().equals(false)).toList();
+
+        teachers.removeAll(deleteTeachers);
+
+        return deleteTeachers.size();
+    }
+}
 
 
 
